@@ -1,5 +1,6 @@
 import Unit from "../models/unit.js";
-import { generateLesson } from "../ai/contentGenerator.js";
+import { generateLesson } from "../ai/contentGenerator.js";4
+import { generateQuiz } from "../ai/quizGenerator.js";
 
 // Create Unit
 export const createUnit = async (req, res) => {
@@ -61,5 +62,36 @@ export const generateUnitAI = async (req, res) => {
       message: "AI generation failed",
       error: error.message
     });
+  }
+};
+// Generate Quiz Unit using AI
+export const generateQuizUnit = async (req, res) => {
+  try {
+
+    const { moduleId, topic } = req.body;
+
+    if (!moduleId || !topic) {
+      return res.status(400).json({
+        message: "moduleId and topic are required"
+      });
+    }
+
+    const quiz = await generateQuiz(topic);
+
+    const unit = await Unit.create({
+      moduleId,
+      type: "quiz",
+      content: quiz
+    });
+
+    res.status(201).json(unit);
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: "Quiz generation failed",
+      error: error.message
+    });
+
   }
 };

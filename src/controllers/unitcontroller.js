@@ -113,9 +113,15 @@ export const getNextUnit = async (req, res) => {
 
   try {
 
-    const { moduleId, topic } = req.body;
+    const { userId, moduleId, topic } = req.body;
 
-    const unit = await generateNextUnit(moduleId, topic);
+    if (!userId || !moduleId || !topic) {
+      return res.status(400).json({
+        message: "userId, moduleId and topic are required"
+      });
+    }
+
+    const unit = await generateNextUnit(userId, moduleId, topic);
 
     res.json(unit);
 

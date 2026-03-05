@@ -18,7 +18,6 @@ router.get("/:moduleId", getUnitsByModule);
 // AI generated unit
 router.post("/generate", generateUnitAI);
 router.post("/generate-quiz", generateQuizUnit);
-
 router.post("/next-unit", getNextUnit);
 router.post("/track-interaction", trackInteraction);
 

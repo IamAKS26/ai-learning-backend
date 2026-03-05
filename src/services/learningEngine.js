@@ -2,6 +2,7 @@ import Unit from "../models/unit.js";
 import { generateLesson } from "../ai/contentGenerator.js";
 import { generateQuiz } from "../ai/quizGenerator.js";
 import UserPreference from "../models/userPreference.js";
+import { generateVideo } from "../ai/videoGenerator.js";
 
 /*
 Decides what type of unit should be generated next
@@ -66,15 +67,17 @@ export const generateNextUnit = async (userId, moduleId, topic) => {
 
   let content;
 
-  // generate lesson
-  if (type === "read") {
-    content = await generateLesson(topic);
-  }
+if (type === "read") {
+  content = await generateLesson(topic);
+}
 
-  // generate quiz
-  if (type === "quiz") {
-    content = await generateQuiz(topic);
-  }
+if (type === "quiz") {
+  content = await generateQuiz(topic);
+}
+
+if (type === "video") {
+  content = await generateVideo(topic);
+}
 
   const unit = await Unit.create({
     moduleId,

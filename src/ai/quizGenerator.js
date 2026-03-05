@@ -3,20 +3,31 @@ import { callAI } from "./aiClient.js";
 export const generateQuiz = async (topic) => {
 
   const prompt = `
-  Generate 3 multiple choice questions about ${topic}.
+You are an educational quiz generator.
 
-  Return ONLY valid JSON in this format:
+Create 3 MCQ questions about "${topic}".
 
-  [
+Rules:
+- Return ONLY valid JSON
+- No explanation text
+- No markdown
+
+Format:
+
+{
+  "questions": [
     {
-      "question": "question text",
-      "options": ["A", "B", "C", "D"],
-      "correctAnswer": "correct option"
+      "question": "text",
+      "options": ["A","B","C","D"],
+      "correctAnswer": "A"
     }
   ]
-  `;
+}
+`;
 
   const result = await callAI(prompt);
 
-  return JSON.parse(result);
+  const parsed = JSON.parse(result);
+
+  return parsed.questions;
 };

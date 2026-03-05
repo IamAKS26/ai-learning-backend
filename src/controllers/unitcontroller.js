@@ -1,6 +1,9 @@
 import Unit from "../models/unit.js";
 import { generateLesson } from "../ai/contentGenerator.js";4
 import { generateQuiz } from "../ai/quizGenerator.js";
+import { generateNextUnit } from "../services/learningEngine.js";
+import { recordInteraction } from "../services/interactionService.js";
+import { updatePreference } from "../services/preferenceService.js";
 
 // Create Unit
 export const createUnit = async (req, res) => {
@@ -64,8 +67,10 @@ export const generateUnitAI = async (req, res) => {
     });
   }
 };
+
 // Generate Quiz Unit using AI
 export const generateQuizUnit = async (req, res) => {
+
   try {
 
     const { moduleId, topic } = req.body;
@@ -77,6 +82,13 @@ export const generateQuizUnit = async (req, res) => {
     }
 
     const quiz = await generateQuiz(topic);
+
+    // Validate AI response
+    if (!Array.isArray(quiz)) {
+      return res.status(500).json({
+        message: "Invalid quiz format from AI"
+      });
+    }
 
     const unit = await Unit.create({
       moduleId,
@@ -94,4 +106,60 @@ export const generateQuizUnit = async (req, res) => {
     });
 
   }
+
+};
+
+export const getNextUnit = async (req, res) => {
+
+  try {
+
+    const { moduleId, topic } = req.body;
+
+    const unit = await generateNextUnit(moduleId, topic);
+
+    res.json(unit);
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message
+    });
+
+  }
+
+};
+export const trackInteraction = async (req, res) => {
+
+  try {
+
+    const {
+      userId,
+      unitId,
+      moduleId,
+      type,
+      timeSpent,
+      quizScore,
+      completed
+    } = req.body;
+
+    const interaction = await recordInteraction({
+      userId,
+      unitId,
+      moduleId,
+      type,
+      timeSpent,
+      quizScore,
+      completed
+    });
+
+    res.status(201).json(interaction);
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message
+    });
+
+  }
+
 };

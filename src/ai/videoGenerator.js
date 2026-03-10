@@ -1,7 +1,8 @@
 import axios from "axios";
+import { videoLimiter } from "../utils/videoLimiter.js";
 
 export const generateVideo = async (topic) => {
-
+  return videoLimiter.schedule(async () => {
   const url = "https://www.googleapis.com/youtube/v3/search";
 
   const response = await axios.get(url, {
@@ -64,5 +65,5 @@ for (const video of filteredVideos) {
     channelTitle: bestVideo.snippet.channelTitle
   };
 
-
+  });
 };

@@ -1,4 +1,5 @@
 import Groq from "groq-sdk";
+import { aiLimiter } from "../utils/aiLimiter.js";
 
 let groqInstance;
 
@@ -6,29 +7,34 @@ function getGroq() {
   if (groqInstance) return groqInstance;
 
   const apiKey = process.env.GROQ_API_KEY;
+
   if (!apiKey) {
-    // helpful error to guide developer
     throw new Error(
       "GROQ_API_KEY environment variable is missing or empty. " +
-        "Ensure you have run dotenv.config() very early (e.g. in app.js) " +
-        "and that the .env file contains a valid key, or pass an apiKey option."
+      "Ensure dotenv.config() runs early and your .env contains a valid key."
     );
   }
 
-  groqInstance = new Groq({ apiKey });  
+  groqInstance = new Groq({ apiKey });
   return groqInstance;
 }
 
 export const callAI = async (prompt) => {
-  const response = await getGroq().chat.completions.create({
-    messages: [
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-    model: "llama-3.1-8b-instant",
+
+  return aiLimiter.schedule(async () => {
+
+    const response = await getGroq().chat.completions.create({
+      messages: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      model: "llama-3.1-8b-instant"
+    });
+
+    return response.choices[0].message.content;
+
   });
 
-  return response.choices[0].message.content;
 };

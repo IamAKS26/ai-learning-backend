@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import rateLimit from "express-rate-limit";
 
 dotenv.config();
 import express from "express";
@@ -18,6 +19,14 @@ app.use(express.json());
 app.use("/api/courses",courseRoutes);
 app.use("/api/modules", moduleRoutes);
 app.use("/api/units", unitRoutes);
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  message: "Too many requests. Please try again later."
+});
+app.use(limiter);
+
 
 app.get("/", (req, res) => {
   res.send("AI Learning Backend Running 🚀");

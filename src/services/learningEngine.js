@@ -3,7 +3,7 @@ import { generateLesson } from "../ai/contentGenerator.js";
 import { generateQuiz } from "../ai/quizGenerator.js";
 import UserPreference from "../models/userPreference.js";
 import { generateVideo } from "../ai/videoGenerator.js";
-
+import { generateTask } from "../ai/taskGenerator.js";
 /*
 Decides what type of unit should be generated next
 based on user preference + module progress
@@ -65,7 +65,7 @@ export const generateNextUnit = async (userId, moduleId, topic) => {
     };
   }
 
-  let content;
+ let content;
 
 if (type === "read") {
   content = await generateLesson(topic);
@@ -77,6 +77,10 @@ if (type === "quiz") {
 
 if (type === "video") {
   content = await generateVideo(topic);
+}
+
+if (type === "task") {
+  content = await generateTask(topic);
 }
 
   const unit = await Unit.create({

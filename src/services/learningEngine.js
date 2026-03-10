@@ -1,15 +1,18 @@
 import Unit from "../models/unit.js";
+import { logger } from "../utils/logger.js";
 import { generateLesson } from "../ai/contentGenerator.js";
 import { generateQuiz } from "../ai/quizGenerator.js";
 import UserPreference from "../models/userPreference.js";
 import { generateVideo } from "../ai/videoGenerator.js";
 import { generateTask } from "../ai/taskGenerator.js";
+
 /*
 Decides what type of unit should be generated next
 based on user preference + module progress
 */
-
 export const decideNextUnitType = async (userId, moduleId) => {
+
+  logger.info(`Deciding next unit type for module ${moduleId}`);
 
   // get units already generated for this module
   const units = await Unit.find({ moduleId });
@@ -45,49 +48,56 @@ export const decideNextUnitType = async (userId, moduleId) => {
   // sort highest weight first
   weights.sort((a, b) => b.value - a.value);
 
-  return weights[0].type;
-};
+  const selectedType = weights[0].type;
 
+  logger.info(`Preference selected unit type: ${selectedType}`);
+
+  return selectedType;
+};
 
 
 /*
 Generate the next unit dynamically
 */
-
 export const generateNextUnit = async (userId, moduleId, topic) => {
 
   const type = await decideNextUnitType(userId, moduleId);
 
+  logger.info(`Generating ${type} unit for topic: ${topic}`);
+
   // module finished
   if (type === "complete") {
+    logger.info(`Module ${moduleId} completed`);
     return {
       message: "Module completed"
     };
   }
 
- let content;
+  let content;
 
-if (type === "read") {
-  content = await generateLesson(topic);
-}
+  if (type === "read") {
+    content = await generateLesson(topic);
+  }
 
-if (type === "quiz") {
-  content = await generateQuiz(topic);
-}
+  if (type === "quiz") {
+    content = await generateQuiz(topic);
+  }
 
-if (type === "video") {
-  content = await generateVideo(topic);
-}
+  if (type === "video") {
+    content = await generateVideo(topic);
+  }
 
-if (type === "task") {
-  content = await generateTask(topic);
-}
+  if (type === "task") {
+    content = await generateTask(topic);
+  }
 
   const unit = await Unit.create({
     moduleId,
     type,
     content
   });
+
+  logger.info(`Unit created with type: ${type}`);
 
   return unit;
 };

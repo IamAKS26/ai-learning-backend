@@ -1,5 +1,6 @@
 import Unit from "../models/unit.js";
-import { generateLesson } from "../ai/contentGenerator.js";4
+import { nextUnitSchema } from "../validators/unitValidator.js";
+import { generateLesson } from "../ai/contentGenerator.js";
 import { generateQuiz } from "../ai/quizGenerator.js";
 import { generateNextUnit } from "../services/learningEngine.js";
 import { recordInteraction } from "../services/interactionService.js";
@@ -113,8 +114,9 @@ export const getNextUnit = async (req, res) => {
 
   try {
 
-    const { userId, moduleId, topic } = req.body;
+   const validated = nextUnitSchema.parse(req.body);
 
+  const { userId, moduleId, topic } = validated;
     if (!userId || !moduleId || !topic) {
       return res.status(400).json({
         message: "userId, moduleId and topic are required"
@@ -148,6 +150,7 @@ export const trackInteraction = async (req, res) => {
       completed
     } = req.body;
 
+    // 1️⃣ Save interaction
     const interaction = await recordInteraction({
       userId,
       unitId,
@@ -158,7 +161,24 @@ export const trackInteraction = async (req, res) => {
       completed
     });
 
-    res.status(201).json(interaction);
+    // 2️⃣ Calculate engagement score
+    let engagement = 0.5;
+
+    if (completed) {
+      engagement = 1;
+    }
+
+    if (quizScore !== undefined) {
+      engagement = quizScore > 1 ? 1 : 0.6;
+    }
+
+    // 3️⃣ Update learning preference
+    await updatePreference(userId, type, engagement);
+
+    res.status(201).json({
+      message: "Interaction recorded and preference updated",
+      interaction
+    });
 
   } catch (error) {
 
@@ -167,5 +187,5 @@ export const trackInteraction = async (req, res) => {
     });
 
   }
-
+console.log("Generating next unit for:", topic);
 };

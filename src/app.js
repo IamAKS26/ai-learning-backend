@@ -1,10 +1,10 @@
 import dotenv from "dotenv";
 
 dotenv.config();
-
 import express from "express";
 import cors from "cors";
 import connectDB from "./config/db.js";
+import { errorHandler } from "./middleware/errorMiddleware.js";
 import courseRoutes from "./routes/courseRoute.js";
 import moduleRoutes from "./routes/moduleRoute.js";
 import unitRoutes from "./routes/unitRoute.js";
@@ -12,7 +12,7 @@ import unitRoutes from "./routes/unitRoute.js";
 connectDB();
 
 const app = express();
-
+app.use(errorHandler);
 app.use(cors());
 app.use(express.json());
 app.use("/api/courses",courseRoutes);

@@ -1,7 +1,7 @@
 import UserPreference from "../models/userPreference.js";
 
 export const updatePreference = async (userId, type, engagement) => {
-
+  logger.info(`Updating preference for user ${userId}`);
   let preference = await UserPreference.findOne({ userId });
 
   if (!preference) {

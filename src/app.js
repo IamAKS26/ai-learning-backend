@@ -9,6 +9,8 @@ import { errorHandler } from "./middleware/errorMiddleware.js";
 import courseRoutes from "./routes/courseRoute.js";
 import moduleRoutes from "./routes/moduleRoute.js";
 import unitRoutes from "./routes/unitRoute.js";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./config/swagger.js";
 
 connectDB();
 
@@ -19,13 +21,14 @@ app.use(express.json());
 app.use("/api/courses",courseRoutes);
 app.use("/api/modules", moduleRoutes);
 app.use("/api/units", unitRoutes);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100,
   message: "Too many requests. Please try again later."
 });
-app.use(limiter);
+app.use(limiter); 
 
 
 app.get("/", (req, res) => {

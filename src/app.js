@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import rateLimit from "express-rate-limit";
-
+import authRoutes from "./routes/authRoutes.js";
 dotenv.config();
 import express from "express";
 import cors from "cors";
@@ -13,7 +13,7 @@ import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger.js";
 
 connectDB();
-
+app.use("/api/auth", authRoutes);
 const app = express();
 app.use(errorHandler);
 app.use(cors());

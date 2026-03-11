@@ -111,22 +111,17 @@ export const generateQuizUnit = async (req, res) => {
 };
 
 export const getNextUnit = async (req, res) => {
-
   try {
 
-   const validated = nextUnitSchema.parse(req.body);
+    const userId = req.user.id;
 
-  const { userId, moduleId, topic } = validated;
-    if (!userId || !moduleId || !topic) {
-      return res.status(400).json({
-        message: "userId, moduleId and topic are required"
-      });
-    }
+    const validated = nextUnitSchema.parse(req.body);
+    const { moduleId, topic } = validated;
 
     const unit = await generateNextUnit(userId, moduleId, topic);
 
     res.json(unit);
-
+console.log("Generating next unit for:", topic);
   } catch (error) {
 
     res.status(500).json({
@@ -134,22 +129,21 @@ export const getNextUnit = async (req, res) => {
     });
 
   }
-
 };
 export const trackInteraction = async (req, res) => {
 
   try {
 
-    const {
-      userId,
-      unitId,
-      moduleId,
-      type,
-      timeSpent,
-      quizScore,
-      completed
-    } = req.body;
+  const userId = req.user.id;
 
+const {
+  unitId,
+  moduleId,
+  type,
+  timeSpent,
+  quizScore,
+  completed
+} = req.body;
     // 1️⃣ Save interaction
     const interaction = await recordInteraction({
       userId,
@@ -187,5 +181,4 @@ export const trackInteraction = async (req, res) => {
     });
 
   }
-console.log("Generating next unit for:", topic);
 };

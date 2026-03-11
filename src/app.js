@@ -10,18 +10,36 @@ import courseRoutes from "./routes/courseRoute.js";
 import moduleRoutes from "./routes/moduleRoute.js";
 import unitRoutes from "./routes/unitRoute.js";
 import swaggerUi from "swagger-ui-express";
-import { swaggerSpec } from "./config/swagger.js";
+import helmet from "helmet";
+import { setupSwagger } from "./config/swagger.js";
 
 connectDB();
-app.use("/api/auth", authRoutes);
+
 const app = express();
-app.use(errorHandler);
-app.use(cors());
 app.use(express.json());
+app.use(helmet());
+app.use(errorHandler);
+app.use(express.json());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://your-frontend-domain.com"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+  })
+);
+
+app.use("/api/auth", authRoutes);
+
+
+
 app.use("/api/courses",courseRoutes);
 app.use("/api/modules", moduleRoutes);
 app.use("/api/units", unitRoutes);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(setupSwagger));
+setupSwagger(app);
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes

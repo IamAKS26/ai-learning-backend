@@ -1,4 +1,5 @@
 import { callAI } from "./aiClient.js";
+import { safeJsonParse } from "../utils/safeJsonParse.js";
 
 export const generateQuiz = async (topic) => {
 
@@ -27,7 +28,7 @@ Format:
 
   const result = await callAI(prompt);
 
-  const parsed = JSON.parse(result);
+  const parsed = safeJsonParse(result);
 
   return parsed.questions;
 };

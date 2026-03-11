@@ -6,6 +6,7 @@ import { generateNextUnit } from "../services/learningEngine.js";
 import { recordInteraction } from "../services/interactionService.js";
 import { updatePreference } from "../services/preferenceService.js";
 
+
 // Create Unit
 export const createUnit = async (req, res) => {
   try {
@@ -115,13 +116,14 @@ export const getNextUnit = async (req, res) => {
 
     const userId = req.user.id;
 
-    const validated = nextUnitSchema.parse(req.body);
-    const { moduleId, topic } = validated;
+    const { moduleId, topic } = req.body;
 
     const unit = await generateNextUnit(userId, moduleId, topic);
 
+    console.log("Generating next unit for:", topic);
+
     res.json(unit);
-console.log("Generating next unit for:", topic);
+
   } catch (error) {
 
     res.status(500).json({

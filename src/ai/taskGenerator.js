@@ -1,5 +1,5 @@
 import { callAI } from "./aiClient.js";
-
+import { safeJsonParse } from "../utils/safeJsonParse.js";
 export const generateTask = async (topic) => {
 
   const prompt = `
@@ -26,7 +26,7 @@ Return ONLY valid JSON:
 
   const result = await callAI(prompt);
 
-  const parsed = JSON.parse(result);
+  const parsed = safeJsonParse(result);
 
   return parsed.tasks;
 };

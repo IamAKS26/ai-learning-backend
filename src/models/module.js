@@ -4,8 +4,12 @@ const moduleSchema = new mongoose.Schema({
   courseId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Course",
+    required: true
   },
-  title: String,
-});
+  title: {
+    type: String,
+    required: true
+  }
+}, { timestamps: true });
 
 export default mongoose.model("Module", moduleSchema);

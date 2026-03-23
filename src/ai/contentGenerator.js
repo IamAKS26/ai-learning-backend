@@ -1,16 +1,7 @@
 import { callAI } from "./aiClient.js";
+import { buildLessonPrompt } from "./promptBuilder.js";
 
 export const generateLesson = async (topic) => {
-
-  const prompt = `
-  Create a structured beginner-friendly lesson about ${topic}.
-
-  Include:
-  1. Introduction
-  2. Explanation
-  3. Example
-  4. Summary
-  `;
-
+  const prompt = buildLessonPrompt(topic);
   return await callAI(prompt);
 };

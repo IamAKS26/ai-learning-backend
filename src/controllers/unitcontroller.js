@@ -1,5 +1,5 @@
 import Unit from "../models/unit.js";
-import { nextUnitSchema } from "../validators/unitValidator.js";
+import { nextUnitSchema, interactionSchema } from "../validators/unitValidator.js";
 import { generateLesson } from "../ai/contentGenerator.js";
 import { generateQuiz } from "../ai/quizGenerator.js";
 import { generateNextUnit } from "../services/learningEngine.js";
@@ -10,13 +10,9 @@ import { updatePreference } from "../services/preferenceService.js";
 // Create Unit
 export const createUnit = async (req, res) => {
   try {
-    const { moduleId, type, content } = req.body;
+    const { moduleId, type, content, title, duration } = req.body;
 
-    const unit = await Unit.create({
-      moduleId,
-      type,
-      content,
-    });
+    const unit = await Unit.create({ moduleId, type, content, title, duration });
 
     res.status(201).json(unit);
   } catch (error) {
@@ -38,114 +34,82 @@ export const getUnitsByModule = async (req, res) => {
   }
 };
 
-// Generate Unit using AI
+// Generate Lesson Unit using AI
 export const generateUnitAI = async (req, res) => {
   try {
-
     const { moduleId, topic } = req.body;
 
     if (!moduleId || !topic) {
-      return res.status(400).json({
-        message: "moduleId and topic are required"
-      });
+      return res.status(400).json({ message: "moduleId and topic are required" });
     }
 
-    // Call AI generator
     const lesson = await generateLesson(topic);
 
-    // Save generated content
     const unit = await Unit.create({
       moduleId,
       type: "read",
+      title: `Lesson: ${topic}`,
       content: lesson
     });
 
     res.status(201).json(unit);
 
   } catch (error) {
-    res.status(500).json({
-      message: "AI generation failed",
-      error: error.message
-    });
+    res.status(500).json({ message: "AI generation failed", error: error.message });
   }
 };
 
 // Generate Quiz Unit using AI
 export const generateQuizUnit = async (req, res) => {
-
   try {
-
     const { moduleId, topic } = req.body;
 
     if (!moduleId || !topic) {
-      return res.status(400).json({
-        message: "moduleId and topic are required"
-      });
+      return res.status(400).json({ message: "moduleId and topic are required" });
     }
 
     const quiz = await generateQuiz(topic);
 
-    // Validate AI response
     if (!Array.isArray(quiz)) {
-      return res.status(500).json({
-        message: "Invalid quiz format from AI"
-      });
+      return res.status(500).json({ message: "Invalid quiz format from AI" });
     }
 
     const unit = await Unit.create({
       moduleId,
       type: "quiz",
+      title: `Quiz: ${topic}`,
       content: quiz
     });
 
     res.status(201).json(unit);
 
   } catch (error) {
-
-    res.status(500).json({
-      message: "Quiz generation failed",
-      error: error.message
-    });
-
+    res.status(500).json({ message: "Quiz generation failed", error: error.message });
   }
-
 };
 
 export const getNextUnit = async (req, res) => {
   try {
-
     const userId = req.user.id;
-
     const { moduleId, topic } = req.body;
 
-    const unit = await generateNextUnit(userId, moduleId, topic);
-
     console.log("Generating next unit for:", topic);
+
+    const unit = await generateNextUnit(userId, moduleId, topic);
 
     res.json(unit);
 
   } catch (error) {
-
-    res.status(500).json({
-      message: error.message
-    });
-
+    res.status(500).json({ message: error.message });
   }
 };
+
 export const trackInteraction = async (req, res) => {
-
   try {
+    const userId = req.user.id;
 
-  const userId = req.user.id;
+    const { unitId, moduleId, type, timeSpent, quizScore, completed } = req.body;
 
-const {
-  unitId,
-  moduleId,
-  type,
-  timeSpent,
-  quizScore,
-  completed
-} = req.body;
     // 1️⃣ Save interaction
     const interaction = await recordInteraction({
       userId,
@@ -157,7 +121,7 @@ const {
       completed
     });
 
-    // 2️⃣ Calculate engagement score
+    // 2️⃣ Calculate engagement score (scores expected as 0–1 range)
     let engagement = 0.5;
 
     if (completed) {
@@ -165,7 +129,8 @@ const {
     }
 
     if (quizScore !== undefined) {
-      engagement = quizScore > 1 ? 1 : 0.6;
+      // >= 80% → high engagement, else moderate
+      engagement = quizScore >= 0.8 ? 1 : 0.6;
     }
 
     // 3️⃣ Update learning preference
@@ -177,10 +142,6 @@ const {
     });
 
   } catch (error) {
-
-    res.status(500).json({
-      message: error.message
-    });
-
+    res.status(500).json({ message: error.message });
   }
 };

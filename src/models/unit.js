@@ -13,6 +13,16 @@ const unitSchema = new mongoose.Schema(
       enum: ["read", "quiz", "video", "task"],
       required: true
     },
+    
+    title: {
+      type: String,
+      required: true
+    },
+
+    duration: {
+      type: String, // e.g., "15:00"
+      default: "00:00"
+    },
 
     content: {
       type: mongoose.Schema.Types.Mixed,

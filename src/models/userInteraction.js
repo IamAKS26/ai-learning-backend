@@ -2,7 +2,8 @@ import mongoose from "mongoose";
 
 const interactionSchema = new mongoose.Schema({
   userId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true
   },
 
@@ -18,15 +19,18 @@ const interactionSchema = new mongoose.Schema({
 
   type: {
     type: String,
-    enum: ["read", "quiz"]
+    enum: ["read", "quiz", "video", "task"]
   },
 
   timeSpent: {
     type: Number
   },
 
+  // Expected range: 0.0 – 1.0
   quizScore: {
-    type: Number
+    type: Number,
+    min: 0,
+    max: 1
   },
 
   completed: {

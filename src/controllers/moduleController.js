@@ -1,5 +1,17 @@
 import Module from "../models/module.js";
 
+// Get a single Module by its ID
+export const getModuleById = async (req, res) => {
+  try {
+    const { moduleId } = req.params;
+    const module = await Module.findById(moduleId);
+    if (!module) return res.status(404).json({ message: "Module not found" });
+    res.json(module);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 // Create Module
 export const createModule = async (req, res) => {

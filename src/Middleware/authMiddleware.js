@@ -29,3 +29,20 @@ export const protect = (req, res, next) => {
   }
 
 };
+
+/**
+ * Optional auth — populates req.user if a valid Bearer token is present,
+ * but never blocks the request. Use on public routes that need owner-aware logic.
+ */
+export const optionalProtect = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader) {
+    const token = authHeader.split(" ")[1];
+    try {
+      req.user = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (_) {
+      // invalid token — treat as unauthenticated, don't reject
+    }
+  }
+  next();
+};

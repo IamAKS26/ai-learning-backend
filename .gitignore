@@ -3,3 +3,9 @@ node_modules/
 .env.*
 dist/
 coverage/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-error.log*

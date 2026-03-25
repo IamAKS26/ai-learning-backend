@@ -12,15 +12,16 @@ Rules:
 - Return ONLY valid JSON
 - No explanation text
 - No markdown
+- "correctAnswer" MUST be the EXACT full text of one of the strings in "options" (not a letter like A or B)
 
 Format:
 
 {
   "questions": [
     {
-      "question": "text",
-      "options": ["A","B","C","D"],
-      "correctAnswer": "A"
+      "question": "What does HTML stand for?",
+      "options": ["Hyper Text Markup Language", "High Tech Modern Language", "Hyper Transfer Markup Logic", "Home Text Markup Language"],
+      "correctAnswer": "Hyper Text Markup Language"
     }
   ]
 }
@@ -30,5 +31,5 @@ Format:
 
   const parsed = safeJsonParse(result);
 
-  return parsed.questions;
+  return parsed ? parsed.questions : [];
 };

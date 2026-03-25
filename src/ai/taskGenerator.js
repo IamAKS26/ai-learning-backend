@@ -18,7 +18,10 @@ Return ONLY valid JSON:
   "tasks": [
     {
       "title": "task title",
-      "description": "task instruction"
+      "description": "task instruction",
+      "language": "python",
+      "starterCode": "def solution():\\n    pass",
+      "testCases": [{"input": "5", "expectedOutput": "120"}]
     }
   ]
 }
@@ -28,5 +31,5 @@ Return ONLY valid JSON:
 
   const parsed = safeJsonParse(result);
 
-  return parsed.tasks;
+  return parsed ? parsed.tasks : [];
 };

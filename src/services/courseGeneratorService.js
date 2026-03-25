@@ -74,6 +74,35 @@ export const generateFullCourse = async (userId, topic, level) => {
         content: quizContent
       });
       units.push(quizUnit);
+
+      // Video unit
+      try {
+        const { generateVideo } = await import("../ai/videoGenerator.js");
+        const videoContent = await generateVideo(topicItem);
+        const videoUnit = await Unit.create({
+          moduleId: module._id,
+          type: "video",
+          title: videoContent.title || `Video: ${topicItem}`,
+          content: videoContent
+        });
+        units.push(videoUnit);
+      } catch (err) {
+        logger.warn(`Failed to generate video for ${topicItem}, skipping...`, err.message);
+      }
+      // Task unit
+      try {
+        const { generateTask } = await import("../ai/taskGenerator.js");
+        const taskContent = await generateTask(topicItem);
+        const taskUnit = await Unit.create({
+          moduleId: module._id,
+          type: "task",
+          title: `Task: ${topicItem}`,
+          content: taskContent
+        });
+        units.push(taskUnit);
+      } catch (err) {
+        logger.warn(`Failed to generate task for ${topicItem}, skipping...`, err.message);
+      }
     }
 
     totalUnits += units.length;

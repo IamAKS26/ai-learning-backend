@@ -20,10 +20,17 @@ export const decideNextUnitType = async (userId, moduleId) => {
 
   const pref = await UserPreference.findOne({ userId });
 
+  // Limit module size
+  if (units.length >= 5) {
+    return "complete";
+  }
+
   // No preference yet → sensible default sequence
   if (!pref) {
-    if (lessonCount < 2) return "read";
-    if (quizCount < 1)   return "quiz";
+    if (lessonCount === 0) return "read";
+    if (lessonCount === 1) return "video";
+    if (quizCount === 0) return "quiz";
+    if (lessonCount === 2) return "task";
     return "complete";
   }
 
@@ -34,8 +41,27 @@ export const decideNextUnitType = async (userId, moduleId) => {
     { type: "task",  value: pref.taskWeight  }
   ];
 
-  weights.sort((a, b) => b.value - a.value);
-  const selectedType = weights[0].type;
+  // Prevent back-to-back exact same types
+  const lastUnit = units[units.length - 1];
+  if (lastUnit) {
+    const lastObj = weights.find(w => w.type === lastUnit.type);
+    if (lastObj) {
+      lastObj.value *= 0.1; // aggressively penalize repeating the same type
+    }
+  }
+
+  // Weighted random selection
+  const totalWeight = weights.reduce((sum, w) => sum + w.value, 0);
+  let random = Math.random() * totalWeight;
+  let selectedType = weights[0].type;
+
+  for (const w of weights) {
+    if (random <= w.value) {
+      selectedType = w.type;
+      break;
+    }
+    random -= w.value;
+  }
 
   logger.info(`Preference selected unit type: ${selectedType}`);
   return selectedType;

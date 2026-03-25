@@ -5,7 +5,8 @@ import {
   getCourseById,
   generateCourseAI,
   publishCourse,
-  unpublishCourse
+  unpublishCourse,
+  deleteCourse
 } from "../controllers/courseController.js";
 import { protect, optionalProtect } from "../Middleware/authMiddleware.js";
 import { validate } from "../Middleware/validate.js";
@@ -25,5 +26,6 @@ router.put("/:id/unpublish", protect, unpublishCourse);
 router.post("/create", protect, createCourse);
 router.get("/",    optionalProtect, getCourses);         // shows published + own unpublished if authed
 router.get("/:id", optionalProtect, getCourseById);      // owner can view own unpublished
+router.delete("/:id", protect, deleteCourse);
 
 export default router;

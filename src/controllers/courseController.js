@@ -182,3 +182,33 @@ export const unpublishCourse = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// ── Delete a course ───────────────────────────────────────────────────────
+export const deleteCourse = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const courseId = req.params.id;
+
+    const course = await Course.findById(courseId);
+
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    if (course.createdBy?.toString() !== userId) {
+      return res.status(403).json({ message: "Not authorized to delete this course" });
+    }
+
+    // Cascade delete modules and units
+    const modules = await Module.find({ courseId });
+    const moduleIds = modules.map(m => m._id);
+    await Unit.deleteMany({ moduleId: { $in: moduleIds } });
+    await Module.deleteMany({ courseId });
+
+    await Course.findByIdAndDelete(courseId);
+
+    res.json({ message: "Course deleted successfully", id: courseId });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

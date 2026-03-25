@@ -34,6 +34,20 @@ export const getUnitsByModule = async (req, res) => {
   }
 };
 
+// Get single Unit by ID
+export const getUnitById = async (req, res) => {
+  try {
+    const unit = await Unit.findById(req.params.id);
+    if (!unit) {
+      return res.status(404).json({ message: "Unit not found" });
+    }
+    res.json(unit);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
 // Generate Lesson Unit using AI
 export const generateUnitAI = async (req, res) => {
   try {
@@ -136,9 +150,20 @@ export const trackInteraction = async (req, res) => {
     // 3️⃣ Update learning preference
     await updatePreference(userId, type, engagement);
 
+    // 4️⃣ Find the next unit in the module sequence
+    let nextUnitId = null;
+    if (moduleId) {
+      const allUnits = await Unit.find({ moduleId }).sort({ createdAt: 1 });
+      const currentIndex = allUnits.findIndex(u => u._id.toString() === unitId);
+      if (currentIndex !== -1 && currentIndex < allUnits.length - 1) {
+        nextUnitId = allUnits[currentIndex + 1]._id.toString();
+      }
+    }
+
     res.status(201).json({
       message: "Interaction recorded and preference updated",
-      interaction
+      interaction,
+      nextUnitId
     });
 
   } catch (error) {

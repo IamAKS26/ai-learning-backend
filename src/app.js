@@ -15,6 +15,8 @@ import authRoutes from "./routes/authRoutes.js";
 import courseRoutes from "./routes/courseRoute.js";
 import moduleRoutes from "./routes/moduleRoute.js";
 import unitRoutes from "./routes/unitRoute.js";
+import noteRoutes from "./routes/noteRoute.js";
+import codeRoutes from "./routes/codeRoute.js";
 
 connectDB();
 
@@ -22,13 +24,6 @@ const app = express();
 
 // ── Security ───────────────────────────────────────────────────────────────
 app.use(helmet());
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
-  message: "Too many requests. Please try again later."
-});
-app.use(limiter);
 
 app.use(
   cors({
@@ -42,6 +37,13 @@ app.use(
   })
 );
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // Increased for development
+  message: "Too many requests. Please try again later."
+});
+app.use(limiter);
+
 // ── Body parsing ───────────────────────────────────────────────────────────
 app.use(express.json());
 
@@ -54,6 +56,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/modules", moduleRoutes);
 app.use("/api/units", unitRoutes);
+app.use("/api/notes", noteRoutes);
+app.use("/api/code", codeRoutes);
 
 // ── Swagger docs ───────────────────────────────────────────────────────────
 setupSwagger(app);

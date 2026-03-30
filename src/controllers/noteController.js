@@ -4,17 +4,15 @@ import Note from "../models/note.js";
 export const createNote = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { moduleId, unitId, content } = req.body;
-
-    if (!moduleId) {
-      return res.status(400).json({ message: "moduleId is required" });
-    }
+    const { courseId, moduleId, unitId, content, metadata } = req.body;
 
     const note = await Note.create({
       userId,
-      moduleId,
+      courseId: courseId || null,
+      moduleId: moduleId || null,
       unitId: unitId || null,
-      content: content || ""
+      content: content || "",
+      metadata: metadata || {}
     });
 
     res.status(201).json(note);
@@ -23,14 +21,16 @@ export const createNote = async (req, res) => {
   }
 };
 
-// GET /api/notes?moduleId= — get all notes for a module (current user)
+// GET /api/notes — get notes with optional filters
 export const getNotes = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { moduleId } = req.query;
+    const { courseId, moduleId, unitId } = req.query;
 
     const filter = { userId };
+    if (courseId) filter.courseId = courseId;
     if (moduleId) filter.moduleId = moduleId;
+    if (unitId) filter.unitId = unitId;
 
     const notes = await Note.find(filter).sort({ updatedAt: -1 });
     res.json(notes);
@@ -43,15 +43,60 @@ export const getNotes = async (req, res) => {
 export const updateNote = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { content } = req.body;
+    const { content, metadata } = req.body;
 
     const note = await Note.findOne({ _id: req.params.id, userId });
     if (!note) return res.status(404).json({ message: "Note not found" });
 
-    note.content = content;
+    if (content !== undefined) note.content = content;
+    if (metadata !== undefined) note.metadata = metadata;
     await note.save();
 
     res.json(note);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// POST /api/notes/sync — upsert multiple notes
+export const syncNotes = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { notes } = req.body;
+
+    if (!Array.isArray(notes)) {
+      return res.status(400).json({ message: "Expected an array of notes" });
+    }
+
+    const syncResults = await Promise.all(
+      notes.map(async (n) => {
+         // Create or update based on a local ID check 
+         // Since local notes might not have a Mongo ID initially, we might need to rely on the frontend sending the Mongo _id if it exists.
+         // Or just upsert based on some criteria. Let's assume frontend sends _id if it exists.
+         
+         if (n._id && n._id.length === 24) { // likely a Mongo ID
+            const existing = await Note.findOne({ _id: n._id, userId });
+            if (existing) {
+               existing.content = n.content;
+               existing.metadata = n.metadata || existing.metadata;
+               await existing.save();
+               return existing;
+            }
+         }
+
+         // Otherwise create a new one
+         return await Note.create({
+            userId,
+            courseId: n.courseId || null,
+            moduleId: n.moduleId || null,
+            unitId: n.unitId || null,
+            content: n.content || "",
+            metadata: n.metadata || {}
+         });
+      })
+    );
+
+    res.json(syncResults);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

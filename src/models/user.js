@@ -15,7 +15,12 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true
-  }
+  },
+
+  xp: { type: Number, default: 0 },
+  badges: { type: Number, default: 0 },
+  certificates: { type: Number, default: 0 },
+  learningHours: { type: Number, default: 0 }
 
 }, { timestamps: true });
 

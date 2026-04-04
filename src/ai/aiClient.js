@@ -38,3 +38,24 @@ export const callAI = async (prompt) => {
   });
 
 };
+
+/**
+ * callAIWithHistory — sends a full conversation history array to Groq.
+ * Each item must be { role: "system"|"user"|"assistant", content: string }.
+ */
+export const callAIWithHistory = async (messages) => {
+
+  return aiLimiter.schedule(async () => {
+
+    const response = await getGroq().chat.completions.create({
+      messages,
+      model: "llama-3.1-8b-instant",
+      temperature: 0.7,
+      max_tokens: 2048
+    });
+
+    return response.choices[0].message.content;
+
+  });
+
+};

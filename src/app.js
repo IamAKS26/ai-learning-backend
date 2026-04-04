@@ -19,6 +19,7 @@ import noteRoutes from "./routes/noteRoute.js";
 import codeRoutes from "./routes/codeRoute.js";
 import statsRoutes from "./routes/statsRoute.js";
 import aiRoutes from "./routes/aiRoute.js";
+import communityRoutes from "./routes/communityRoute.js";
 
 connectDB();
 
@@ -62,6 +63,7 @@ app.use("/api/notes", noteRoutes);
 app.use("/api/code", codeRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/community", communityRoutes);
 
 // ── Swagger docs ───────────────────────────────────────────────────────────
 setupSwagger(app);

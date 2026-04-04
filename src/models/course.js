@@ -17,6 +17,21 @@ const courseSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  ratingsCount: {
+    type: Number,
+    default: 0
+  },
+  ratings: [
+    {
+      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      value: { type: Number, min: 1, max: 5 },
+      review: { type: String, default: "" },
+      createdAt: { type: Date, default: Date.now }
+    }
+  ],
+  views: { type: Number, default: 0 },
+  enrolledCount: { type: Number, default: 0 },
+  tags: [{ type: String }],
   category: String,
   lessonsCount: {
     type: Number,
@@ -40,4 +55,4 @@ const courseSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-export default mongoose.model("Course", courseSchema);
+export default mongoose.models.Course || mongoose.model("Course", courseSchema);

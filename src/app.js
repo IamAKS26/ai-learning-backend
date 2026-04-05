@@ -44,7 +44,7 @@ app.use(helmet());
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:5000",
-  "https://ed-ustream.vercel.app/"
+  "https://ed-ustream.vercel.app"
 ];
 
 app.use(

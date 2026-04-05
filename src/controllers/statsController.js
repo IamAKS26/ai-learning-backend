@@ -1,4 +1,4 @@
-import User from "../models/User.js";
+import User from "../models/user.js";
 import Course from "../models/course.js";
 
 // Endpoint to fetch real stats for dashboard

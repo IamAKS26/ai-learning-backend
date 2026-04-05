@@ -17,7 +17,12 @@ export const createNote = async (req, res) => {
 
     res.status(201).json(note);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -35,7 +40,12 @@ export const getNotes = async (req, res) => {
     const notes = await Note.find(filter).sort({ updatedAt: -1 });
     res.json(notes);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -54,7 +64,12 @@ export const updateNote = async (req, res) => {
 
     res.json(note);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -98,7 +113,12 @@ export const syncNotes = async (req, res) => {
 
     res.json(syncResults);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -112,6 +132,11 @@ export const deleteNote = async (req, res) => {
 
     res.json({ message: "Note deleted" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };

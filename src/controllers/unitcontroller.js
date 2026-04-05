@@ -16,7 +16,12 @@ export const createUnit = async (req, res) => {
 
     res.status(201).json(unit);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -30,7 +35,12 @@ export const getUnitsByModule = async (req, res) => {
 
     res.json(units);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -43,7 +53,12 @@ export const getUnitById = async (req, res) => {
     }
     res.json(unit);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -69,7 +84,12 @@ export const generateUnitAI = async (req, res) => {
     res.status(201).json(unit);
 
   } catch (error) {
-    res.status(500).json({ message: "AI generation failed", error: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -98,7 +118,12 @@ export const generateQuizUnit = async (req, res) => {
     res.status(201).json(unit);
 
   } catch (error) {
-    res.status(500).json({ message: "Quiz generation failed", error: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -114,7 +139,12 @@ export const getNextUnit = async (req, res) => {
     res.json(unit);
 
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -167,6 +197,11 @@ export const trackInteraction = async (req, res) => {
     });
 
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };

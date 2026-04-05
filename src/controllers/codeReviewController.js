@@ -52,7 +52,8 @@ Be encouraging but honest. Sound like a helpful senior dev, not a grader.
     let review;
     try {
       review = JSON.parse(cleaned);
-    } catch {
+    } catch (e) {
+      console.error("JSON parse failed", e);
       // If JSON fails, return raw text as summary
       review = {
         rating: 5,
@@ -65,6 +66,11 @@ Be encouraging but honest. Sound like a helpful senior dev, not a grader.
 
     res.json(review);
   } catch (error) {
-    res.status(500).json({ message: "Code review failed", error: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };

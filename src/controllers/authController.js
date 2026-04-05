@@ -27,7 +27,12 @@ export const register = async (req, res) => {
     });
 
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -63,7 +68,12 @@ export const login = async (req, res) => {
     });
 
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -105,7 +115,11 @@ export const googleLogin = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Google login failed:", error);
-    res.status(401).json({ message: "Google login failed", error: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };

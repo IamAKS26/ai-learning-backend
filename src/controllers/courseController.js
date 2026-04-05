@@ -21,7 +21,12 @@ export const createCourse = async (req, res) => {
 
     res.status(201).json(course);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -37,7 +42,12 @@ export const getCourses = async (req, res) => {
     const courses = await Course.find(filter).select("-__v");
     res.json(courses);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -79,7 +89,12 @@ export const getCourseById = async (req, res) => {
 
     res.json(formattedCourse);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -100,7 +115,12 @@ export const generateCourseAI = async (req, res) => {
       }))
     });
   } catch (error) {
-    res.status(500).json({ message: "Course generation failed", error: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -151,7 +171,12 @@ export const publishCourse = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -179,7 +204,12 @@ export const unpublishCourse = async (req, res) => {
       course: { _id: course._id, title: course.title, isPublished: false }
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -209,6 +239,11 @@ export const deleteCourse = async (req, res) => {
 
     res.json({ message: "Course deleted successfully", id: courseId });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };

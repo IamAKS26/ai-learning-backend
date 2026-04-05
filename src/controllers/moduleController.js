@@ -8,7 +8,12 @@ export const getModuleById = async (req, res) => {
     if (!module) return res.status(404).json({ message: "Module not found" });
     res.json(module);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -25,7 +30,12 @@ export const createModule = async (req, res) => {
 
     res.status(201).json(module);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -39,6 +49,11 @@ export const getModulesByCourse = async (req, res) => {
 
     res.json(modules);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };

@@ -31,7 +31,12 @@ export const getCommunityFeed = async (req, res) => {
 
     res.json({ courses, total, page: parseInt(page), pages: Math.ceil(total / limit) });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("API Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: err.message
+    });
   }
 };
 
@@ -53,7 +58,12 @@ export const getStudentProfile = async (req, res) => {
 
     res.json({ user, courses, totalViews, totalEnrolled });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("API Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: err.message
+    });
   }
 };
 
@@ -69,7 +79,12 @@ export const trackCourseView = async (req, res) => {
     if (!course) return res.status(404).json({ message: "Course not found" });
     res.json({ views: course.views });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("API Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: err.message
+    });
   }
 };
 
@@ -109,7 +124,12 @@ export const rateCourse = async (req, res) => {
     await course.save();
     res.json({ rating: course.rating, ratingsCount: course.ratingsCount });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("API Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: err.message
+    });
   }
 };
 
@@ -125,7 +145,12 @@ export const enrollCourse = async (req, res) => {
     if (!course) return res.status(404).json({ message: "Course not found" });
     res.json({ enrolledCount: course.enrolledCount, message: "Enrolled successfully" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("API Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: err.message
+    });
   }
 };
 
@@ -148,6 +173,11 @@ export const getTrending = async (req, res) => {
 
     res.json({ topCourses, topCreators });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("API Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: err.message
+    });
   }
 };

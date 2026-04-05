@@ -46,7 +46,11 @@ export const chatWithAI = async (req, res) => {
 
     res.json({ reply, role: "assistant" });
   } catch (error) {
-    console.error("AI chat error:", error.message);
-    res.status(500).json({ message: "AI chat failed", error: error.message });
+    console.error("API Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };

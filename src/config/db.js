@@ -1,20 +1,24 @@
 import mongoose from "mongoose";
 
+let isConnected = false;
+
 const connectDB = async () => {
-  // Safe MongoDB connection check
-  if (!process.env.MONGODB_URI && !process.env.MONGO_URI) {
+  if (isConnected) return;
+
+  const uri = process.env.MONGODB_URI || process.env.MONGO_URI;
+
+  if (!uri) {
     throw new Error("MONGODB_URI missing");
   }
 
-  // Use either one that is available
-  const uri = process.env.MONGODB_URI || process.env.MONGO_URI;
-
   try {
-    await mongoose.connect(uri);
+    const db = await mongoose.connect(uri);
+    isConnected = db.connections[0].readyState === 1;
     console.log("MongoDB Connected");
   } catch (error) {
     console.error("DB Error:", error);
-    process.exit(1);
+    // DO NOT process.exit(1) in Serverless/Vercel
+    throw error;
   }
 };
 

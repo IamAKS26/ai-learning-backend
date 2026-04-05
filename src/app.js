@@ -21,9 +21,22 @@ import statsRoutes from "./routes/statsRoute.js";
 import aiRoutes from "./routes/aiRoute.js";
 import communityRoutes from "./routes/communityRoute.js";
 
-connectDB();
-
 const app = express();
+
+// ── Serverless-safe Database Connection Middleware ───────────────────────────
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error("Database Connection Failed:", error);
+    res.status(500).json({
+      success: false,
+      message: "Database Connection Failed",
+      error: error.message
+    });
+  }
+});
 
 // ── Security ───────────────────────────────────────────────────────────────
 app.use(helmet());

@@ -7,7 +7,7 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import swaggerUi from "swagger-ui-express";
 
-import connectDB from "./config/db.js";
+
 import { errorHandler } from "./Middleware/errorMiddleware.js";
 import { setupSwagger } from "./config/swagger.js";
 
@@ -23,20 +23,7 @@ import communityRoutes from "./routes/communityRoute.js";
 
 const app = express();
 
-// ── Serverless-safe Database Connection Middleware ───────────────────────────
-app.use(async (req, res, next) => {
-  try {
-    await connectDB();
-    next();
-  } catch (error) {
-    console.error("Database Connection Failed:", error);
-    res.status(500).json({
-      success: false,
-      message: "Database Connection Failed",
-      error: error.message
-    });
-  }
-});
+
 
 // ── Security ───────────────────────────────────────────────────────────────
 app.use(helmet());
@@ -92,5 +79,4 @@ setupSwagger(app);
 // ── Error handler (must be last) ───────────────────────────────────────────
 app.use(errorHandler);
 
-// ── Export for Serverless Deployment (Vercel) ──
 export default app;

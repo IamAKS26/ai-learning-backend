@@ -1,7 +1,13 @@
 import app from "./src/app.js";
+import connectDB from "./src/config/db.js";
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`Server running locally on port ${PORT}`);
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}).catch(err => {
+  console.error("Failed to connect to DB:", err);
+  process.exit(1);
 });

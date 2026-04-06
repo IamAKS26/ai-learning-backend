@@ -1,5 +1,10 @@
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
+import { fileURLToPath } from "url";
+import path from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const options = {
   definition: {
@@ -11,15 +16,30 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:3000"
+        url: process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
+          : "http://localhost:3000"
       }
     ]
   },
-  apis: ["./src/routes/*.js", "./src/controllers/*.js"]
+  apis: [
+    path.join(__dirname, "../routes/*.js"),
+    path.join(__dirname, "../controllers/*.js")
+  ]
 };
 
-const swaggerSpec = swaggerJsdoc(options);
+let swaggerSpec;
+try {
+  swaggerSpec = swaggerJsdoc(options);
+} catch (e) {
+  console.warn("Swagger spec generation failed:", e.message);
+  swaggerSpec = { openapi: "3.0.0", info: { title: "API", version: "1.0.0" }, paths: {} };
+}
 
 export const setupSwagger = (app) => {
-  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  try {
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  } catch (e) {
+    console.warn("Swagger setup failed:", e.message);
+  }
 };

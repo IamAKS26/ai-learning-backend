@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema({
   badges: { type: Number, default: 0 },
   certificates: { type: Number, default: 0 },
   learningHours: { type: Number, default: 0 },
+  streak: { type: Number, default: 0 },
   bio: { type: String, default: "" },
   avatarColor: { type: String, default: "bg-slate-200 text-slate-600" },
   website: { type: String, default: "" }

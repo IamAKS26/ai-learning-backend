@@ -14,7 +14,18 @@ export const getOverviewStats = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const userCourses = await Course.find({ createdBy: userId }).select("-__v");
+    // Find modules the user has interacted with
+    const interactedUnitIds = await UserInteraction.find({ userId }).distinct('moduleId');
+    const activeModules = await Module.find({ _id: { $in: interactedUnitIds } });
+    const activeCourseIds = activeModules.map(m => m.courseId.toString());
+
+    // Fetch courses user has created or interacted with
+    const userCourses = await Course.find({
+      $or: [
+        { createdBy: userId },
+        { _id: { $in: activeCourseIds } }
+      ]
+    }).select("-__v");
     const courseStats = [];
 
     for (const c of userCourses) {
@@ -60,7 +71,7 @@ export const getOverviewStats = async (req, res) => {
       badges: user.badges || 0,
       certificates: user.certificates || 0,
       learningHours: user.learningHours || 0,
-      streak: 5, // Static for now until a streak model is built
+      streak: user.streak || 0, // Dynamic streak using user model
       courses: courseStats,
     });
   } catch (error) {

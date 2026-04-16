@@ -47,7 +47,7 @@ export const getUnitsByModule = async (req, res) => {
 // Get single Unit by ID
 export const getUnitById = async (req, res) => {
   try {
-    const unit = await Unit.findById(req.params.id);
+    const unit = await Unit.findById(req.params.id).populate("moduleId");
     if (!unit) {
       return res.status(404).json({ message: "Unit not found" });
     }
@@ -179,6 +179,27 @@ export const trackInteraction = async (req, res) => {
 
     // 3️⃣ Update learning preference
     await updatePreference(userId, type, engagement);
+
+    // 💰 Dynamically update user XP and learning hours
+    let xpEarned = 0;
+    if (completed) xpEarned += 50; // base complete
+    if (quizScore !== undefined) xpEarned += Math.floor(quizScore * 50);
+    if (type === "task") xpEarned += 100;
+    
+    // Add time spent to learning hours (in seconds -> hours)
+    const hoursEarned = (timeSpent || 0) / 3600;
+
+    const { default: User } = await import("../models/user.js");
+    const userToUpdate = await User.findById(userId);
+    if (userToUpdate) {
+      userToUpdate.xp = (userToUpdate.xp || 0) + xpEarned;
+      userToUpdate.learningHours = (userToUpdate.learningHours || 0) + hoursEarned;
+      if (xpEarned > 0) {
+        // Basic streak update for demonstration that it dynamically updates
+        userToUpdate.streak = (userToUpdate.streak || 0) + 1;
+      }
+      await userToUpdate.save();
+    }
 
     // 4️⃣ Find the next unit in the module sequence
     let nextUnitId = null;
